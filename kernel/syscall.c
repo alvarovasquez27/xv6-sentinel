@@ -7,6 +7,7 @@
 #include "syscall.h"
 #include "defs.h"
 
+
 // Fetch the uint64 at addr from the current process.
 int
 fetchaddr(uint64 addr, uint64 *ip)
@@ -103,6 +104,7 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_sync(void);
+extern uint64 sys_sentinel(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -130,6 +132,7 @@ static uint64 (*syscalls[])(void) = {
   [SYS_mkdir]   = sys_mkdir,
   [SYS_close]   = sys_close,
   [SYS_sync]    = sys_sync,
+  [SYS_sentinel] sys_sentinel,
   // clang-format on
 };
 
@@ -140,12 +143,62 @@ syscall(void)
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+
+  // ===== SENTINEL =====
+  if (p) {
+    int now = ticks;
+
+    if (now - p->last_syscall_tick > 200) {
+      p->syscall_count = 0;
+      p->fork_count = 0;
+      p->open_count = 0;
+      p->write_count = 0;
+      p->exec_count = 0;
+    }
+
+    p->syscall_count++;
+    p->last_syscall_tick = now;
+
+    if (num == SYS_fork)  p->fork_count++;
+    if (num == SYS_open)  p->open_count++;
+    if (num == SYS_write) p->write_count++;
+    if (num == SYS_exec)  p->exec_count++;
+
+    // Alertas
+        if (p->syscall_count > 80) {
+      printk("\n[SENTINEL ALERTA]\n");
+      printk("PID: %d\n", p->pid);
+      printk("Proceso: %s\n", p->name);
+      printk("Eventos: %d\n", p->syscall_count);
+      printk("Tipo: Demasiadas syscalls\n");
+      printk("Accion: Registrada\n\n");
+      p->syscall_count = 0;
+    }
+    if (p->fork_count > 10) {
+      printk("\n[SENTINEL ALERTA]\n");
+      printk("PID: %d\n", p->pid);
+      printk("Proceso: %s\n", p->name);
+      printk("Eventos: %d\n", p->fork_count);
+      printk("Tipo: Posible fork bomb\n");
+      printk("Accion: Proceso terminado\n\n");
+      p->killed = 1;
+      p->fork_count = 0;
+    }
+    if (p->open_count > 40) {
+      printk("\n[SENTINEL ALERTA]\n");
+      printk("PID: %d\n", p->pid);
+      printk("Proceso: %s\n", p->name);
+      printk("Eventos: %d\n", p->open_count);
+      printk("Tipo: Exceso de open\n");
+      printk("Accion: Registrada\n\n");
+      p->open_count = 0;
+    }
+  }
+  // ===== FIN SENTINEL =====
+
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    // Use num to lookup the system call function for num, call it,
-    // and store its return value in p->trapframe->a0
     p->trapframe->a0 = syscalls[num]();
   } else {
-    printk("%d %s: unknown sys call %d\n", p->pid, p->name, num);
     p->trapframe->a0 = -1;
   }
 }

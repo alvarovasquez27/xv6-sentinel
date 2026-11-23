@@ -125,6 +125,14 @@ found:
   p->pid = allocpid();
   p->state = USED;
 
+  // Inicializar Sentinel
+  p->syscall_count = 0;
+  p->fork_count = 0;
+  p->open_count = 0;
+  p->write_count = 0;
+  p->exec_count = 0;
+  p->last_syscall_tick = 0;
+
   // Allocate a trapframe page.
   if ((p->trapframe = (struct trapframe *)kalloc()) == 0) {
     freeproc(p);

@@ -110,3 +110,19 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_sentinel(void)
+{
+  struct proc *p = myproc();
+  printk("===== SENTINEL STATS =====\n");
+  printk("PID: %d\n", p->pid);
+  printk("Nombre: %s\n", p->name);
+  printk("Total syscalls: %d\n", p->syscall_count);
+  printk("Forks: %d\n", p->fork_count);
+  printk("Opens: %d\n", p->open_count);
+  printk("Writes: %d\n", p->write_count);
+  printk("Execs: %d\n", p->exec_count);
+  printk("==========================\n");
+  return 0;
+}

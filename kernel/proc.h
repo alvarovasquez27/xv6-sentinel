@@ -101,4 +101,13 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+
+  // ===== Sentinel =====
+  int syscall_count;           // contador total de llamadas al sistema
+  int fork_count;              // contador de llamadas fork
+  int open_count;              // contador de llamadas open
+  int write_count;             // contador de llamadas write
+  int exec_count;              // contador de llamadas exec
+  int last_syscall_tick;       // ultimo tick en el que se registro una syscall
+  // ====================
 };
