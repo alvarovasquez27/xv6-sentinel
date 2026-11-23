@@ -153,6 +153,7 @@ UPROGS=\
 	$U/_sync\
 	$U/_sentinel\
 	$U/_test_attack\
+	$U/_testfork\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
