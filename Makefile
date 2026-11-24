@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 K=kernel
 U=user
 
