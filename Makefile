@@ -207,7 +207,7 @@ check-qemu-version:
 .PHONY: fmt
 fmt:
 	clang-format -i $(wildcard kernel/*.[ch] user/*.[ch] mkfs/*.c)
-=======
+
 K=kernel
 U=user
 
@@ -416,4 +416,3 @@ check-qemu-version:
 .PHONY: fmt
 fmt:
 	clang-format -i $(wildcard kernel/*.[ch] user/*.[ch] mkfs/*.c)
->>>>>>> 47f0a42d5ec3a14266aa5bcfafa750290d5a144f
