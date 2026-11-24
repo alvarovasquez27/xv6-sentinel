@@ -7,7 +7,9 @@ main(void)
   int i;
   int pid;
 
-  printf("=== PRUEBA FORK SENTINEL ===\n");
+  printf("================================\n");
+  printf("   PRUEBA DE DETECCION FORK\n");
+  printf("================================\n");
   printf("Generando llamadas fork controladas...\n");
 
   for (i = 0; i < 11; i++) {
@@ -19,12 +21,13 @@ main(void)
     }
 
     if (pid == 0) {
+      printf("Proceso hijo creado: PID %d\n", getpid());
       exit(0);
     }
 
     wait(0);
   }
 
-  printf("Prueba finalizada.\n");
+  printf("Prueba fork finalizada\n");
   exit(0);
 }

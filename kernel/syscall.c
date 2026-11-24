@@ -193,6 +193,16 @@ syscall(void)
       printk("Accion: Registrada\n\n");
       p->open_count = 0;
     }
+    if (p->write_count > 50) {
+      printk("\n[SENTINEL ALERTA]\n");
+      printk("PID: %d\n", p->pid);
+      printk("Proceso: %s\n", p->name);
+      printk("Eventos: %d\n", p->write_count);
+      printk("Tipo: Exceso de escritura (write flood)\n");
+      printk("Accion: Proceso terminado\n\n");
+      p->killed = 1;
+      p->write_count = 0;
+    }
   }
   // ===== FIN SENTINEL =====
 
